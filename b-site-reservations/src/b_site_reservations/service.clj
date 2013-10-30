@@ -12,6 +12,8 @@
 
 (def ^:private streaming-contexts (atom {}))
 
+(def ^:private sites (atom {"zadev1" {:bookings [{:owner "bryn"}]}}))
+
 (defn- session-from-context [streaming-context]
   (get-in streaming-context [:request :cookies "client-id" :value]))
 
@@ -23,11 +25,19 @@
   (swap! streaming-contexts dissoc (session-from-context streaming-context))
   (sse/end-event-stream streaming-context))
 
+(defn- send-message [streaming-context event-name event-data]
+  (try
+    (sse/send-event streaming-context event-name (pr-str event-data))))
+
 (defn- notify
   [session-id event-name event-data]
   (when-let [streaming-context (get @streaming-contexts session-id)]
-    (try
-      (sse/send-event streaming-context event-name event-data))))
+    (send-message streaming-context event-name event-data)))
+
+(defn- notify-all
+  [event-name event-data]
+  (doseq [session-id (keys @streaming-contexts)]
+    (notify session-id event-name event-data)))
 
 (defn- notify-all-others
   [sending-session-id event-name event-data]
@@ -40,6 +50,38 @@
     (swap! streaming-contexts assoc session-id streaming-context)))
 
 (defn- session-id [] (.toString (java.util.UUID/randomUUID)))
+
+
+
+
+;; application logic
+
+(defn- mk-update-site-msg [site-name site-data]
+  {:io.pedestal.app.messages/type :update-site
+   :io.pedestal.app.messages/topic [:sites site-name]
+   :value site-data})
+
+(defn- publish-site [site]
+  (notify-all "msg" (mk-update-site-msg site (get @sites site))))
+
+(defn- update-sites [sc]
+  (doseq [[name data] @sites]
+    (send-message sc "msg" (mk-update-site-msg name data))))
+
+(defn- initialize-connection [streaming-context]
+  (store-streaming-context streaming-context)
+  (update-sites streaming-context))
+
+(defn add-booking [{msg-data :edn-params :as request}]
+  (log/info :message "received booking"
+            :msg-data msg-data)
+  (swap! sites update-in [(:site msg-data) :bookings] conj (dissoc msg-data :site))
+  (log/info :message "new sites"
+            :sites @sites)
+  (publish-site (:site msg-data))
+  (ring-resp/response ""))
+
+
 
 (declare url-for)
 
@@ -82,8 +124,10 @@
      ;; Set default interceptors for /about and any other paths under /
      ^:interceptors [(body-params/body-params) bootstrap/html-body session-interceptor]
      ["/about" {:get about-page}]
+     ["/bookings" {:post add-booking}]
+     
      ["/msgs" {:get subscribe :post publish}
-      ["/events" {:get [::events (sse/start-event-stream store-streaming-context)]}]]]]])
+      ["/events" {:get [::events (sse/start-event-stream initialize-connection)]}]]]]])
 
 ;; You can use this fn or a per-request fn via io.pedestal.service.http.route/url-for
 (def url-for (route/url-for-routes routes))

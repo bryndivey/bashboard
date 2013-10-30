@@ -14,12 +14,12 @@
 (defn do-connect [input-queue]
   "Publish the initial set of sites, as would come from the service"
   (doseq [site sample-sites]
-    (p/put-message input-queue {msg/type :swap msg/topic [:sites site]})))
+    (p/put-message input-queue {msg/type :update-site msg/topic [:sites site]})))
 
 (defn add-random-booking [input-queue]
   (let [site (nth sample-sites (rand-int (count sample-sites)))]
-    (p/put-message input-queue {msg/type :append
-                                msg/topic [:sites site :bookings]
+    (p/put-message input-queue {msg/type :add-booking
+                                msg/topic [:sites site]
                                 :value {:owner "bryn"
                                         :purpose "Testing shit"
                                         :start #inst "2013-01-05"

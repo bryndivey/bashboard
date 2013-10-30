@@ -22,7 +22,7 @@
 	  <div template="site" class="site-row" field="id:id">
 	    <span class="site-label">Site:</span>
 	    <span class="site" field="content:name">Test site</span>
-	    <span class="site-owner" field="content:owner">Bryn</span>
+	    <span field="content:bookings">Bryn</span>
 	  </div>
 	</div>
 
@@ -30,10 +30,11 @@
 
 
       <div class="span2">
-	<div class="stat-label">
-	  Total Sites
-	</div>
+	<div class="stat-label">Total Sites</div>
 	<div class="stat" field="content:sites-count">10</div>
+
+	<div class="stat-label">Free Sites</div>
+	<div class="stat" field="content:free-sites"></div>
       </div>
 	
       <div field="content:message" class="message">A Message</div>

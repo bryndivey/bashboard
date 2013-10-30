@@ -17,6 +17,9 @@
 (defn empty-transform [_ _]
   [])
 
+(defn add-booking-transform [old-value message]
+  (update-in old-value [:bookings] conj (:value message)))
+
 ;; emitters
 
 (defn init-main [_]
@@ -47,6 +50,8 @@
                [:append [:sites :* :bookings] append-transform]
                [:empty [:sites :* :bookings] empty-transform]
                [:swap [:**] swap-transform]
+               [:update-site [:sites :*] swap-transform]
+               [:add-booking [:sites :*] add-booking-transform]
                [:debug [:pedestal :**] swap-transform]]
 
    :effect #{[#{[:sites]} publish-sites :single-val]}

@@ -24,7 +24,7 @@
 
 (defn render-site [renderer [_ path _ new-value] input-queue]
   (let [key (last path)]
-    (templates/update-t renderer path {:owner (:owner new-value)})))
+    (templates/update-t renderer path {:bookings (str (:bookings new-value))})))
 
 
 (defn render-sites-element [renderer [_ path] _]
