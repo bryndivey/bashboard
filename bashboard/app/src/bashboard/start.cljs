@@ -5,7 +5,8 @@
             [io.pedestal.app.render :as render]
             [io.pedestal.app.messages :as msg]
             [bashboard.behavior :as behavior]
-            [bashboard.rendering :as rendering]))
+            [bashboard.rendering :as rendering]
+            [bashboard.services :as services]))
 
 ;; In this namespace, the application is built and started.
 
@@ -30,4 +31,8 @@
   ;; for several aspects. A main namespace must have a no argument
   ;; main function. To tie into tooling, this function should return
   ;; the newly created app.
-  (create-app (rendering/render-config)))
+  (let [app (create-app (rendering/render-config))
+        services (services/->Services (:app app))]
+    (app/consume-effects (:app app) services/services-fn)
+    (p/start services)
+    app))

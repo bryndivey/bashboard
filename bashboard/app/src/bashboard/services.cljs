@@ -1,22 +1,30 @@
-(ns bashboard.services)
+(ns bashboard.services
+  (:require [io.pedestal.app.protocols :as p]
+            [cljs.reader :as reader]))
 
-;; The services namespace responsible for communicating with back-end
-;; services. It receives messages from the application's behavior,
-;; makes requests to services and sends responses back to the
-;; behavior.
-;;
-;; This namespace will usually contain a function which can be
-;; configured to receive effect events from the behavior in the file
-;;
-;; app/src/bashboard/start.cljs
-;;
-;; After creating a new application, set the effect handler function
-;; to receive effects
-;;
-;; (app/consume-effect app services-fn)
-;;
-;; A very simple example of a services function which echoes all events
-;; back to the behavior is shown below.
+
+(defn receive-ss-event [app e]
+  (let [message (reader/read-string (.-data e))]
+    (p/put-message (:input app) message)))
+
+(defrecord Services [app]
+  p/Activity
+  (start [this]
+    (let [source (js/EventSource. "/msgs")]
+      (.addEventListener source
+                         "msg"
+                         (fn [e] (receive-ss-event app e))
+                         false)))
+  (stop [this]))
+
+(defn services-fn [message input-queue]
+  (let [body (pr-str message)
+        http (js/XMLHttpRequest.)]
+    (.open http "POST" "/msgs" true)
+    (.setRequestHeader http "Content-Type" "application/edn")
+    (.send http body)))
+
+
 
 (comment
 
