@@ -1,0 +1,45 @@
+<!--
+ The Pedestal application development tools provide a very simple
+ system for composing documents. This partial will be included
+ "within" the application.html file. The div with id "content" in that
+ file will be replaced with the div with id "content" in this file.
+
+ This feature is only part of the tool. It has nothing to do with the
+ ClojureScript application that you are building.
+-->
+<_within file="application.html">
+  
+  <div id="content">
+
+    <div class="row-fluid" template="bashboard" field="id:id">
+      <div class="span6">
+
+	<div>
+	  <button class="btn btn-success" id="clear-sites-button">Clear Sites</button>
+	</div>
+	
+	<div id="sites">
+	  <div template="site" class="site-row" field="id:id">
+	    <span class="site-label">Site:</span>
+	    <span class="site" field="content:name">Test site</span>
+	    <span class="site-owner" field="content:owner">Bryn</span>
+	  </div>
+	</div>
+
+      </div>
+
+
+      <div class="span2">
+	<div class="stat-label">
+	  Total Sites
+	</div>
+	<div class="stat" field="content:sites-count">10</div>
+      </div>
+	
+      <div field="content:message" class="message">A Message</div>
+
+    </div>
+
+  </div>
+
+</_within>
