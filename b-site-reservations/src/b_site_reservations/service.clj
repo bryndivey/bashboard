@@ -12,7 +12,10 @@
 
 (def ^:private streaming-contexts (atom {}))
 
-(def ^:private sites (atom {"zadev1" {:bookings [{:owner "bryn"}]}}))
+(def ^:private sites (atom {"zadev1" {:bookings {192 {:id 192
+                                                      :owner "bryn"
+                                                      :start #inst "2009-12-02"
+                                                      :end #inst "2009-12-05"}}}}))
 
 (defn- session-from-context [streaming-context]
   (get-in streaming-context [:request :cookies "client-id" :value]))
@@ -75,7 +78,7 @@
 (defn add-booking [{msg-data :edn-params :as request}]
   (log/info :message "received booking"
             :msg-data msg-data)
-  (swap! sites update-in [(:site msg-data) :bookings] conj (dissoc msg-data :site))
+  (swap! sites update-in [(:site msg-data) :bookings] assoc (:id msg-data) (dissoc msg-data :site))
   (log/info :message "new sites"
             :sites @sites)
   (publish-site (:site msg-data))
