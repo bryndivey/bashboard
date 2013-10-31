@@ -26,24 +26,19 @@
 (defn render-sites-element [renderer [_ path] _]
   (render/new-id! renderer path "sites"))
 
-(defn render-bookings-element [renderer [_ path] _]
-  (let [id 
-        (render/new-id! renderer path "bookings")]
-    (.log js/console "bookings id " (str path) (str id) )))
-
-(defn create-booking [renderer [_ path] _]
-  (.log js/console "Create" (str path))
+(defn create-site [renderer [_ path _] _]
   (let [parent (render/get-parent-id renderer path)
         id (render/new-id! renderer path)
-        html (templates/add-template renderer path (:booking templates))]
-    (.log js/console "Parent" (str parent))
-    (dom/append (dom/by-id parent) "TEST")
-    (dom/append! (dom/by-id parent) (html {:owner "BLA"}))))
+        html (templates/add-template renderer path (:site templates))]
+    (dom/append! (dom/by-id parent) (html {:id id :name (last path)}))))
 
-(defn render-booking [renderer [_ path _ new-value] input-queue]
-  (.log js/console "Render " (str path) (str new-value) )
-  (templates/update-t renderer path {:owner (:owner new-value)
-                                     :start (str (:start new-value))}))
+(defn render-site [renderer [_ path _ new-value] input-queue]
+  (.log js/console (str new-value))
+  (templates/update-t renderer path {:bookings []})
+  (doseq [[id booking] (:bookings new-value)]
+    (let [id (render/new-id! renderer path)
+          html (templates/add-template renderer (conj path :bookings) (:booking templates))]
+      (templates/append-t renderer path {:bookings (html booking)}))))
 
 (defn render-config []
   [[:node-create [:main]
@@ -51,13 +46,11 @@
    [:node-destroy [:main] h/default-destroy]
    
    [:node-create [:main :sites] render-sites-element]
-   [:node-create [:main :sites :*]
-    (render-template :site (fn [[_ path]] {:name (last path)}))]
+
+   [:node-create [:main :sites :*] create-site]
+   [:value [:main :sites :*] render-site]
    [:node-destroy [:main :sites :*] h/default-destroy]
 
-   [:node-create [:main :sites :* :bookings] render-bookings-element]
-   [:node-create [:main :sites :* :bookings :*] create-booking]
-   [:value [:main :sites :* :bookings :*] render-booking]
    
    [:value [:main :*] render-value]
    

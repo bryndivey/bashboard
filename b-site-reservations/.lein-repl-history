@@ -2,3 +2,5 @@
 (def a {})
 (assoc-in a [:a :b] 1)
 (start)
+2
+(start)

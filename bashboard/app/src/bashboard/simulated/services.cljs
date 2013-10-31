@@ -9,8 +9,7 @@
   (swap! -random-site-num inc)
   (str "random-site-" @-random-site-num))
 
-(comment def sample-sites ["zadev1" "zadev2" "zadev3" "zadev4"])
-(def sample-sites ["zadev1"])
+(def sample-sites ["zadev1" "zadev2" "zadev3" "zadev4"])
 
 (defn do-connect [input-queue]
   "Publish the initial set of sites, as would come from the service"
@@ -27,7 +26,7 @@
                                         :purpose "Testing shit"
                                         :start #inst "2013-01-05"
                                         :end #inst "2013-01-06"}}))
-  (platform/create-timeout (+ 20000 (rand-int 5000)) #(add-random-booking input-queue)))
+  (platform/create-timeout (+ 2000 (rand-int 5000)) #(add-random-booking input-queue)))
 
 (defn receive-messages [input-queue]
   (do-connect input-queue)

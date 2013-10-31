@@ -70,7 +70,6 @@
           [#{[:test :**]
              [:counter]
              [:sites :*]
-             [:sites :* :bookings :*]
              [:sites-count]
              [:free-sites]} (app/default-emitter [:main])]
           [#{[:pedestal :debug :*]} (app/default-emitter [])]

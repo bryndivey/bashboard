@@ -16,6 +16,6 @@
   ;; use ids to set values so you cannot dynamically set an id.
   {:bashboard-page (dtfn (tnodes "bashboard.html" "bashboard" [[:#sites]]) #{:id})
    :site (dtfn (tnodes "bashboard.html" "site" [[:#bookings]]) #{:id})
-   :booking (dtfn (tnodes "bashboard.html" "booking") #{:id})})
+   :booking (dtfn (tnodes "bashboard.html" "booking"))})
 
 ;; Note: this file will not be reloaded automatically when it is changed.
