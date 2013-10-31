@@ -15,6 +15,7 @@
   ;; treated as static fields (may only be set once). Dynamic templates
   ;; use ids to set values so you cannot dynamically set an id.
   {:bashboard-page (dtfn (tnodes "bashboard.html" "bashboard" [[:#sites]]) #{:id})
-   :site (dtfn (tnodes "bashboard.html" "site") #{:id})})
+   :site (dtfn (tnodes "bashboard.html" "site" [[:#bookings]]) #{:id})
+   :booking (dtfn (tnodes "bashboard.html" "booking") #{:id})})
 
 ;; Note: this file will not be reloaded automatically when it is changed.

@@ -14,15 +14,24 @@
     <div class="row-fluid" template="bashboard" field="id:id">
       <div class="span6">
 
-	<div>
+	<!--div>
 	  <button class="btn btn-success" id="clear-sites-button">Clear Sites</button>
-	</div>
+	</div-->
 	
 	<div id="sites">
 	  <div template="site" class="site-row" field="id:id">
-	    <span class="site-label">Site:</span>
-	    <span class="site" field="content:name">Test site</span>
-	    <span field="content:bookings">Bryn</span>
+	    <div class="site-info">
+	      <span class="site-label">Site:</span>
+	      <span class="site" field="content:name">Test site</span>
+	    </div>
+	    <div id="bookings">
+	      <div template="booking" class="booking" field="id:id">
+		<span>Owner:</span>
+		<span field="content:owner">Bryn</span>
+		<span>Until:</span>
+		<span field="content:start">1999-12-31</span>
+	      </div>
+	    </div>
 	  </div>
 	</div>
 
@@ -34,7 +43,7 @@
 	<div class="stat" field="content:sites-count">10</div>
 
 	<div class="stat-label">Free Sites</div>
-	<div class="stat" field="content:free-sites"></div>
+	<div class="stat" field="content:free-sites">Test site</div>
       </div>
 	
       <div field="content:message" class="message">A Message</div>

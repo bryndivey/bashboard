@@ -43,6 +43,12 @@
 
 ;; app
 
+(defn test-emitter
+  ([inputs]
+     (.log js/console "INPUTS" (str inputs)))
+  ([inputs changed-inputs]
+     (.log js/console "CHANGED" inputs)))
+
 (def example-app
   {:version 2
 ;;   :debug true
@@ -51,7 +57,7 @@
                [:empty [:sites :* :bookings] empty-transform]
                [:swap [:**] swap-transform]
                [:update-site [:sites :*] swap-transform]
-               [:add-booking [:sites :*] add-booking-transform]
+               [:add-booking [:sites :* :bookings :*] swap-transform]
                [:debug [:pedestal :**] swap-transform]]
 
    :effect #{[#{[:sites]} publish-sites :single-val]}
@@ -64,7 +70,9 @@
           [#{[:test :**]
              [:counter]
              [:sites :*]
+             [:sites :* :bookings :*]
              [:sites-count]
              [:free-sites]} (app/default-emitter [:main])]
-          [#{[:pedestal :debug :*]} (app/default-emitter [])]]})
+          [#{[:pedestal :debug :*]} (app/default-emitter [])]
+ ]})
 
