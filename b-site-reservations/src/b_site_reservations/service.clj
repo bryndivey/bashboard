@@ -113,6 +113,27 @@
                        (pr-str msg-data)))
   (ring-resp/response ""))
 
+(defn validate-name [name]
+  (bootstrap/json-response
+   {:result (boolean (some #{name} '("bryn" "lloyd")))}))
+
+(defn process
+  "Route a message based on type"
+  [{msg-data :edn-params :as request}]
+  (log/info :message "received message"
+            :request request
+            :msg-data msg-data)
+  
+  (let [session-id (or (session-from-request request)
+                       (session-id))
+        msg-type (:io.pedestal.app.messages/type msg-data)]
+    (log/info msg-data)
+    (log/info :message-type msg-type)
+    (log/info :message-type (= msg-type :validate-name))
+    (cond
+     (= msg-type :validate-name) (validate-name (:name msg-data))
+     :else (bootstrap/json-response {:result "invalid msg"}))))
+
 
 (defn about-page
   [request]
@@ -129,7 +150,7 @@
      ["/about" {:get about-page}]
      ["/bookings" {:post add-booking}]
      
-     ["/msgs" {:get subscribe :post publish}
+     ["/msgs" {:get subscribe :post process}
       ["/events" {:get [::events (sse/start-event-stream initialize-connection)]}]]]]])
 
 ;; You can use this fn or a per-request fn via io.pedestal.service.http.route/url-for
