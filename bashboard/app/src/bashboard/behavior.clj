@@ -1,6 +1,7 @@
 (ns ^:shared bashboard.behavior
     (:require [clojure.string :as string]
               [io.pedestal.app :as app]
+              [io.pedestal.app.dataflow :as dataflow]
               [io.pedestal.app.messages :as msg]
               [io.pedestal.app.util.log :as log]))
 
@@ -56,9 +57,15 @@
 ;; effects
 
 (defn login-user [{:keys [name] :as data}]
-  (log/debug "LOGIN USER " data)
   [{msg/type :login-user :name name}])
 
+
+;; continues
+
+(defn start-with-user [inputs]
+  (let [validated (dataflow/old-and-new inputs [:validated-user])]
+    (when (:new validated)
+      [^:input {msg/topic msg/app-model msg/type :set-focus :name :main}])))
 
 ;; app
 
@@ -79,6 +86,8 @@
                [:debug [:pedestal :**] swap-transform]]
 
    :effect #{[{[:login :name] :name} login-user :map]}
+
+   :continue #{[#{[:validated-user]} start-with-user]}
 
    :derive #{[#{[:sites :*]} [:sites-count] derive-count :vals]
              [#{[:sites]} [:free-sites] derive-free-site :single-val]

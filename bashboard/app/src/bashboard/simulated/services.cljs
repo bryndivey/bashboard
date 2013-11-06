@@ -47,15 +47,17 @@
 
 
 
-(defn login-user [name]
+(defn login-user-1 [name]
   [{msg/type :swap msg/topic [:validated-user] :value {:username name}}
    {msg/type :set-focus msg/topic msg/app-model :name :main}])
+
+(defn login-user [name]
+  [{msg/type :swap msg/topic [:validated-user] :value {:username name}}])
 
 
 (defn services-fn [msg-data input-queue]
   (log/info (str "Sending msg to server: " msg-data))
     
-  (log/info msg-data)
   (let [msg-type (msg/type msg-data)
         response (cond
                   (= msg-type :login-user) (login-user (:name msg-data))
