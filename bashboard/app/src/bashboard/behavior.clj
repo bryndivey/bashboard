@@ -1,7 +1,8 @@
 (ns ^:shared bashboard.behavior
     (:require [clojure.string :as string]
               [io.pedestal.app :as app]
-              [io.pedestal.app.messages :as msg]))
+              [io.pedestal.app.messages :as msg]
+              [io.pedestal.app.util.log :as log]))
 
 ;; transforms
 
@@ -41,11 +42,21 @@
   username)
 
 (defn derive-free-site [_ sites]
-  (for [[name data] sites
-        :when (= 0 (count (:bookings data)))]
-    name))
+  (let [free (for [[name data] sites
+                   :when (= 0 (count (:bookings data)))]
+               name)]
+    (clojure.string/join ", " free)))
+
+;; effects
+
+(defn validate-name [{:keys [name]}]
+  [{msg/type :validate-name :name name}])
 
 ;; app
+
+(defn login-validate [_ value]
+  (log/error "LOGIN VALIDATE " value)
+  (:value value))
 
 (def example-app
   {:version 2
@@ -55,12 +66,15 @@
            :main [[:main] [:pedestal]]
            :default :login}
    
-   :transform [[:append [:sites :* :bookings] append-transform]
+   :transform [[:name-validation-result [:login :valid] login-validate]
+               [:append [:sites :* :bookings] append-transform]
                [:empty [:sites :* :bookings] empty-transform]
                [:swap [:**] swap-transform]
                [:update-site [:sites :*] swap-transform]
                [:add-booking [:sites :* :bookings :*] swap-transform]
                [:debug [:pedestal :**] swap-transform]]
+
+   :effect #{[{[:login :name] :name} validate-name :map]}
 
    :derive #{[#{[:sites :*]} [:sites-count] derive-count :vals]
              [#{[:sites]} [:free-sites] derive-free-site :single-val]
@@ -70,7 +84,8 @@
           [#{[:login :*]} (app/default-emitter [])]
           
           {:init init-main}
-          [#{[:username]
+          [#{[:login :*]
+             [:username]
              [:sites :*]
              [:sites-count]
              [:free-sites]} (app/default-emitter [:main])]

@@ -81,6 +81,15 @@
                       :output-root :tools-public
                       ;; The data-ui aspect uses the tooling.html template
                       :template "tooling.html"}
+            :data-ui-backend {:uri "/bashboard-data-ui-backend.html"
+                              :params  "renderer=auto"
+                              :name "Data UI with Backend"
+                              :order 7
+                              :out-file "bashboard-data-ui-backend.js"
+                              :main bashboard.start
+                              :logging? true
+                              :output-root :tools-public
+                              :template "tooling.html"}            
             ;; Useful for viewing rendering output with a simulated start
             :ui  {:uri  "/bashboard-ui.html"
                   :name  "UI"

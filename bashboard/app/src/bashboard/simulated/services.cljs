@@ -1,7 +1,8 @@
 (ns bashboard.simulated.services
   (:require [io.pedestal.app.protocols :as p]
             [io.pedestal.app.messages :as msg]
-            [io.pedestal.app.util.platform :as platform]))
+            [io.pedestal.app.util.platform :as platform]
+            [io.pedestal.app.util.log :as log]))
 
 
 (def -random-site-num (atom 0))
@@ -40,6 +41,27 @@
   (stop [this]))
 
 
-(defn services-fn [message input-queue]
-  (.log js/console (str "Sending msg to server: ")))
+
+
+
+
+
+
+(defn validate-name [name]
+  {msg/type :name-validation-result
+   msg/topic [:login :valid]
+   :value (boolean (some #{name} '("bryn" "lloyd")))})
+
+
+(defn services-fn [msg-data input-queue]
+  (log/info (str "Sending msg to server: " msg-data))
+    
+  (log/info msg-data)
+  (let [msg-type (msg/type msg-data)
+        response (cond
+                  (= msg-type :validate-name) (validate-name (:name msg-data))
+                  :else {msg/type :error msg/topic [:main :error] :value "invalid msg"})]
+    (log/info "Response: " response)
+    (p/put-message input-queue response)
+    ))
 

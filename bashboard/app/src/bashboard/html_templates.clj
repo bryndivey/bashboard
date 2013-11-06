@@ -14,8 +14,11 @@
   ;; The last argument to 'dtfn' is a set of fields that should be
   ;; treated as static fields (may only be set once). Dynamic templates
   ;; use ids to set values so you cannot dynamically set an id.
-  {:bashboard-page (dtfn (tnodes "bashboard.html" "bashboard" [[:#sites]]) #{:id})
+  {:login-page (tfn (tnodes "login.html" "login"))
+   :bashboard-page (dtfn (tnodes "bashboard.html" "bashboard" [[:#sites]]) #{:id})
    :site (dtfn (tnodes "bashboard.html" "site" [[:#bookings]]) #{:id})
-   :booking (dtfn (tnodes "bashboard.html" "booking"))})
+   :booking (dtfn (tnodes "bashboard.html" "booking"))
+
+   })
 
 ;; Note: this file will not be reloaded automatically when it is changed.
