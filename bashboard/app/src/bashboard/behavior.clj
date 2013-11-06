@@ -22,53 +22,55 @@
 
 ;; emitters
 
+(defn init-login [_]
+  [[:node-create [:login] :map]
+   [:node-create [:login :name] :map]
+   [:transform-enable [:login :name]
+    :login [{msg/type :swap msg/topic [:login :name] (msg/param :value) {}}
+            {msg/type :set-focus msg/topic msg/app-model :name :main}]]])
+
 (defn init-main [_]
-  [[:transform-enable [:main :counter] :inc [{msg/topic [:counter]}]]
-   [:transform-enable [:main :sites] :empty [{msg/topic [:sites "zadev1" :bookings]}]]])
-
-;; effects
-
-(defn publish-sites [sites]
-  [{msg/type :swap msg/topic [:other-sites] :value sites}])
+  [[:transform-enable [:main :sites] :empty [{msg/topic [:sites "zadev1" :bookings]}]]])
 
 ;; derivations
 
 (defn derive-count [_ sites]
   (count sites))
 
-(defn derive-free-nodes [_ sites]
+(defn derive-username [_ username]
+  username)
+
+(defn derive-free-site [_ sites]
   (for [[name data] sites
         :when (= 0 (count (:bookings data)))]
     name))
 
 ;; app
 
-(defn test-emitter
-  ([inputs]
-     (.log js/console "INPUTS" (str inputs)))
-  ([inputs changed-inputs]
-     (.log js/console "CHANGED" inputs)))
-
 (def example-app
   {:version 2
 ;;   :debug true
-   :transform [[:inc [:counter] inc-transform]
-               [:append [:sites :* :bookings] append-transform]
+
+   :focus {:login [[:login]]
+           :main [[:main] [:pedestal]]
+           :default :login}
+   
+   :transform [[:append [:sites :* :bookings] append-transform]
                [:empty [:sites :* :bookings] empty-transform]
                [:swap [:**] swap-transform]
                [:update-site [:sites :*] swap-transform]
                [:add-booking [:sites :* :bookings :*] swap-transform]
                [:debug [:pedestal :**] swap-transform]]
 
-   :effect #{[#{[:sites]} publish-sites :single-val]}
-   
    :derive #{[#{[:sites :*]} [:sites-count] derive-count :vals]
-             [#{[:sites]} [:free-sites] derive-free-nodes :single-val]}
+             [#{[:sites]} [:free-sites] derive-free-site :single-val]
+             [#{[:login :name]} [:username] derive-username :single-val]}
    
-   :emit [
+   :emit [{:init init-login}
+          [#{[:login :*]} (app/default-emitter [])]
+          
           {:init init-main}
-          [#{[:test :**]
-             [:counter]
+          [#{[:username]
              [:sites :*]
              [:sites-count]
              [:free-sites]} (app/default-emitter [:main])]

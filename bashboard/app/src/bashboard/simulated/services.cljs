@@ -26,7 +26,7 @@
                                         :purpose "Testing shit"
                                         :start #inst "2013-01-05"
                                         :end #inst "2013-01-06"}}))
-  (platform/create-timeout (+ 2000 (rand-int 5000)) #(add-random-booking input-queue)))
+  (platform/create-timeout (+ 20000 (rand-int 5000)) #(add-random-booking input-queue)))
 
 (defn receive-messages [input-queue]
   (do-connect input-queue)
