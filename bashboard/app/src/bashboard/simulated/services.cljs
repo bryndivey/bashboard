@@ -47,10 +47,9 @@
 
 
 
-(defn validate-name [name]
-  {msg/type :name-validation-result
-   msg/topic [:login :valid]
-   :value (boolean (some #{name} '("bryn" "lloyd")))})
+(defn login-user [name]
+  [{msg/type :swap msg/topic [:validated-user] :value {:username name}}
+   {msg/type :set-focus msg/topic msg/app-model :name :main}])
 
 
 (defn services-fn [msg-data input-queue]
@@ -59,9 +58,11 @@
   (log/info msg-data)
   (let [msg-type (msg/type msg-data)
         response (cond
-                  (= msg-type :validate-name) (validate-name (:name msg-data))
-                  :else {msg/type :error msg/topic [:main :error] :value "invalid msg"})]
+                  (= msg-type :login-user) (login-user (:name msg-data))
+                  :else [{msg/type :error
+                          msg/topic [:main :error]
+                          :value "invalid msg"}])]
     (log/info "Response: " response)
-    (p/put-message input-queue response)
+    (doall (map #(p/put-message input-queue %) response))
     ))
 

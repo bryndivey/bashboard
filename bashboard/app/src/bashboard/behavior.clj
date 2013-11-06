@@ -23,12 +23,18 @@
 
 ;; emitters
 
-(defn init-login [_]
+(defn init-login-1 [_]
   [[:node-create [:login] :map]
    [:node-create [:login :name] :map]
    [:transform-enable [:login :name]
     :login [{msg/type :swap msg/topic [:login :name] (msg/param :value) {}}
             {msg/type :set-focus msg/topic msg/app-model :name :main}]]])
+
+(defn init-login [_]
+  [[:node-create [:login] :map]
+   [:node-create [:login :name] :map]
+   [:transform-enable [:login :name]
+    :login [{msg/type :swap msg/topic [:login :name] (msg/param :value) {}}]]])
 
 (defn init-main [_]
   [[:transform-enable [:main :sites] :empty [{msg/topic [:sites "zadev1" :bookings]}]]])
@@ -38,8 +44,8 @@
 (defn derive-count [_ sites]
   (count sites))
 
-(defn derive-username [_ username]
-  username)
+(defn derive-username [_ user]
+  (:username user))
 
 (defn derive-free-site [_ sites]
   (let [free (for [[name data] sites
@@ -49,14 +55,13 @@
 
 ;; effects
 
-(defn validate-name [{:keys [name]}]
-  [{msg/type :validate-name :name name}])
+(defn login-user [{:keys [name] :as data}]
+  (log/debug "LOGIN USER " data)
+  [{msg/type :login-user :name name}])
+
 
 ;; app
 
-(defn login-validate [_ value]
-  (log/error "LOGIN VALIDATE " value)
-  (:value value))
 
 (def example-app
   {:version 2
@@ -66,25 +71,24 @@
            :main [[:main] [:pedestal]]
            :default :login}
    
-   :transform [[:name-validation-result [:login :valid] login-validate]
-               [:append [:sites :* :bookings] append-transform]
+   :transform [[:append [:sites :* :bookings] append-transform]
                [:empty [:sites :* :bookings] empty-transform]
                [:swap [:**] swap-transform]
                [:update-site [:sites :*] swap-transform]
                [:add-booking [:sites :* :bookings :*] swap-transform]
                [:debug [:pedestal :**] swap-transform]]
 
-   :effect #{[{[:login :name] :name} validate-name :map]}
+   :effect #{[{[:login :name] :name} login-user :map]}
 
    :derive #{[#{[:sites :*]} [:sites-count] derive-count :vals]
              [#{[:sites]} [:free-sites] derive-free-site :single-val]
-             [#{[:login :name]} [:username] derive-username :single-val]}
+             [#{[:validated-user]} [:username] derive-username :single-val]}
    
    :emit [{:init init-login}
           [#{[:login :*]} (app/default-emitter [])]
           
           {:init init-main}
-          [#{[:login :*]
+          [#{[:validated-user]
              [:username]
              [:sites :*]
              [:sites-count]
