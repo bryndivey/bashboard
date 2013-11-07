@@ -1,0 +1,23 @@
+[
+ ;; nodes
+ 
+ {:db/id #db/id[:db.part/user -1000001]
+  :node/mac "00:25:90:68:80:2e"
+  :node/ilom "dev-cluster246.lom.bais.nimbula.org"}
+ 
+{:db/id #db/id[:db.part/user -1000002]
+  :node/mac "00:25:90:68:fc:78"
+  :node/ilom "dev-cluster247.lom.bais.nimbula.org"}
+
+{:db/id #db/id[:db.part/user -1000003]
+  :node/mac "00:25:90:6a:cd:dc"
+  :node/ilom "dev-cluster248.lom.bais.nimbula.org"}
+
+ ;; sites
+
+ {:db/id #db/id[:db.part/user -1000004]
+  :site/name "bais110"
+  :site/api-endpoint "http://api.bais110.nimbula.org"
+  :site/iprange "10.32.73.0/24"
+  :site/node [#db/id [:db.part/user -1000001] #db/id [:db.part/user -1000002] #db/id [:db.part/user -1000003]]}
+]

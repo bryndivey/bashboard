@@ -11,7 +11,8 @@
                  ;; use Tomcat instead of Jetty:
                  [io.pedestal/pedestal.jetty "0.2.2-SNAPSHOT"]
                  ;; [io.pedestal/pedestal.tomcat "0.2.2-SNAPSHOT"]
-                 ]
+
+                 [com.datomic/datomic-free "0.8.4254"]]
   :min-lein-version "2.0.0"
   :resource-paths ["config", "resources"]
   :aliases {"run-dev" ["trampoline" "run" "-m" "b-site-reservations.server/run-dev"]}

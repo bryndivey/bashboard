@@ -1,0 +1,63 @@
+[
+
+ ;; site
+
+ {:db/id #db/id[:db.part/db]
+  :db/ident :site/name
+  :db/valueType :db.type/string 
+  :db/cardinality :db.cardinality/one
+  :db/fulltext true
+  :db/doc "Site name"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id[:db.part/db]
+  :db/ident :site/api-endpoint
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/doc "Site's API URL"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id[:db.part/db]
+  :db/ident :site/node
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/many
+  :db/doc "Nodes belonging to site"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id[:db.part/db]
+  :db/ident :site/iprange
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/doc "Human-readable IP range for site"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id[:db.part/db]
+  :db/ident :site/state
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/one
+  :db/doc "Enum of state"
+  :db.install/_attribute :db.part/db}
+
+ [:db/add #db/id[:db.part/user] :db/ident :site.state/up]
+ [:db/add #db/id[:db.part/user] :db/ident :site.state/down]
+ [:db/add #db/id[:db.part/user] :db/ident :site.state/unknown]
+
+
+
+ ;; node
+
+ {:db/id #db/id[:db.part/db]
+  :db/ident :node/mac
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/doc "MAC address for node"
+  :db.install/_attribute :db.part/db}
+  
+ {:db/id #db/id[:db.part/db]
+  :db/ident :node/ilom
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/doc "ILOM hostname for node"
+  :db.install/_attribute :db.part/db} 
+ 
+]
