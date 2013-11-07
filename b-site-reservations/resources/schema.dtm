@@ -38,6 +38,13 @@
   :db/doc "Enum of state"
   :db.install/_attribute :db.part/db}
 
+ {:db/id #db/id[:db.part/db]
+  :db/ident :site/version
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/doc "Version pulled from the API (if possible)"
+  :db.install/_attribute :db.part/db}
+
  [:db/add #db/id[:db.part/user] :db/ident :site.state/up]
  [:db/add #db/id[:db.part/user] :db/ident :site.state/down]
  [:db/add #db/id[:db.part/user] :db/ident :site.state/unknown]

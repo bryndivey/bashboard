@@ -238,3 +238,17 @@ d/datoms
 (doseq [a (q '[:find ?when ?tx ?state ?change :where [?e :site/state ?s ?tx ?change] [?s :db/ident ?state] [?tx :db/txInstant ?when] [(= ?change true)]] hdb)] (println a))
 (doseq [a (q '[:find ?when ?tx ?state ?change :where [?e :site/state ?s ?tx ?change] [?s :db/ident ?state] [?tx :db/txInstant ?when] [(= ?change true)]] (db conn))] (println a))
 (doc d/history)
+(doc sort)
+(doc comparator)
+(def changes (q '[:find ?when ?tx ?state ?change :where [?e :site/state ?s ?tx ?change] [?s :db/ident ?state] [?tx :db/txInstant ?when] [(= ?change true)]] (db conn)))
+changes
+(def changes (q '[:find ?when ?tx ?state ?change :where [?e :site/state ?s ?tx ?change] [?s :db/ident ?state] [?tx :db/txInstant ?when] [(= ?change true)]] (d/history db)))
+(def changes (q '[:find ?when ?tx ?state ?change :where [?e :site/state ?s ?tx ?change] [?s :db/ident ?state] [?tx :db/txInstant ?when] [(= ?change true)]] (d/history (db conn))))
+changes
+(sort changes)
+(doseq [change (sort changes)] (println change))
+(def db (db conn))
+(clojure.java.io/file "/home/bryn/workspace/director/trunk/devscripts/autobuild/")
+(doc file-seq)
+(file-seq (clojure.java.io/file "/home/bryn/workspace/director/trunk/devscripts/autobuild/"))
+(map str (filter #(= "nodes.json" (.getName %)) (file-seq (clojure.java.io/file "/home/bryn/workspace/director/trunk/devscripts/autobuild/"))))
